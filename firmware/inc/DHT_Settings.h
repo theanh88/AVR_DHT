@@ -15,6 +15,6 @@
 
 //----- Configuration --------------------------//
 #define DHT_Type	DHT11          //DHT11 or DHT22
-#define DHT_Pin		C, 7
+#define DHT_Pin		F, 1
 //----------------------------------------------//
 #endif
