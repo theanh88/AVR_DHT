@@ -4,7 +4,6 @@
  *  Created on: Apr 30, 2022
  *      Author: Group 3
  */
-#define F_CPU 7372800UL
 #include <avr/io.h>
 #include <util/delay.h>
 #include <avr/iom128.h>
@@ -14,68 +13,27 @@
 // Output Port pin duty cycle
 #define PORT_MOTOR_DUTY      PORTE
 #define DDR_MOTOR_DUTY       DDRE
-#define BIT_MOTOR_DUTY        4
+#define BIT_MOTOR_DUTY       4
 
-// Output Port pin1 motor
+// Output Port IN1 motor
 #define PORT_MOTOR_1      PORTE
 #define DDR_MOTOR_1       DDRE
-#define BIT_MOTOR_1         3
+#define BIT_MOTOR_1       3
 
-// Output Port pin2 motor
+// Output Port IN2 motor
 #define PORT_MOTOR_2      PORTE
 #define DDR_MOTOR_2       DDRE
-#define BIT_MOTOR_2         5
+#define BIT_MOTOR_2       5
 
 // Define frequency
 #define PWM_MAX_DUTY_CYCLE 0x3FF
 
-void PWM_vInit(void) {
-	/*
-	 Start Timer 1 with clock prescaler CLK/8 and phase correct
-	 10-bit PWM mode. Output on PB6 (OC1B). Resolution is 1.09 us.
-	 Frequency is 450 Hz.
-	 */
+void init_IO(void);
+void PWM_vInit(void);
+void PWM_vSetDutyCycle(uint16_t u16DutyCycle);
+void Start(void);
+void Stop(void);
 
-	TCCR3A = (0<<COM3A1)|(0<<COM3A0)|(1<<COM3B1)|(0<<COM3B0)
-				|(0<<COM3C1)|(0<<COM3C0)|(1<<WGM31)|(1 << WGM30);
-
-	TCCR3B = (0<<ICNC3)|(0<<ICES3)|(0<<WGM33)|(0<<WGM32)
-				|(0<<CS32)|(1<<CS31)|(0<<CS30);
-
-	// Reset counter
-	TCNT3 = 0;//
-
-
-	// Set duty cycle to 0%
-	OCR3B = 0;
-
-}
-
-void PWM_vSetDutyCycle(uint16_t u16DutyCycle) {
-	// Clip parameter to maximum value
-	if (u16DutyCycle > PWM_MAX_DUTY_CYCLE) {
-		u16DutyCycle = PWM_MAX_DUTY_CYCLE;
-	}
-	OCR3B = u16DutyCycle;
-}
-void Start(){
-	//start motor
-	PORT_MOTOR_1 |= (1 << BIT_MOTOR_1);
-	PORT_MOTOR_2 &= ~(1 << BIT_MOTOR_2);
-}
-
-void Stop()
-{
-	PORT_MOTOR_1 &= ~(1 << BIT_MOTOR_1);
-	PORT_MOTOR_2 &= ~(1 << BIT_MOTOR_2);
-}
-void init_IO()
-{
-
-    DDR_MOTOR_DUTY |= (1 << BIT_MOTOR_DUTY);
-    DDR_MOTOR_1 |= (1 << BIT_MOTOR_1);
-    DDR_MOTOR_2 |= (1 << BIT_MOTOR_2);
-}
 int main(void)
 {
 	// Initialise port IO
@@ -149,5 +107,57 @@ int main(void)
 	}
 
 	return 0;
+}
+
+void init_IO(void)
+{
+    DDR_MOTOR_DUTY |= (1 << BIT_MOTOR_DUTY);
+    DDR_MOTOR_1 |= (1 << BIT_MOTOR_1);
+    DDR_MOTOR_2 |= (1 << BIT_MOTOR_2);
+}
+
+void PWM_vInit(void)
+{
+	/*
+	 Start Timer 1 with clock prescaler CLK/8 and phase correct
+	 10-bit PWM mode. Output on PB6 (OC1B). Resolution is 1.09 us.
+	 Frequency is 450 Hz.
+	 */
+
+	TCCR3A = (0<<COM3A1)|(0<<COM3A0)|(1<<COM3B1)|(0<<COM3B0)
+				|(0<<COM3C1)|(0<<COM3C0)|(1<<WGM31)|(1 << WGM30);
+
+	TCCR3B = (0<<ICNC3)|(0<<ICES3)|(0<<WGM33)|(0<<WGM32)
+				|(0<<CS32)|(1<<CS31)|(0<<CS30);
+
+	// Reset counter
+	TCNT3 = 0;//
+
+
+	// Set duty cycle to 0%
+	OCR3B = 0;
+
+}
+
+void PWM_vSetDutyCycle(uint16_t u16DutyCycle)
+{
+	// Clip parameter to maximum value
+	if (u16DutyCycle > PWM_MAX_DUTY_CYCLE) {
+		u16DutyCycle = PWM_MAX_DUTY_CYCLE;
+	}
+	OCR3B = u16DutyCycle;
+}
+
+void Start(void)
+{
+	//start motor
+	PORT_MOTOR_1 |= (1 << BIT_MOTOR_1);
+	PORT_MOTOR_2 &= ~(1 << BIT_MOTOR_2);
+}
+
+void Stop(void)
+{
+	PORT_MOTOR_1 &= ~(1 << BIT_MOTOR_1);
+	PORT_MOTOR_2 &= ~(1 << BIT_MOTOR_2);
 }
 
